@@ -1,0 +1,90 @@
+cmake_minimum_required (VERSION 3.6)
+project (ta-lib C CXX)
+
+set (CMAKE_C_STANDARD 11)
+set (CMAKE_CXX_STANDARD 14)
+set (CMAKE_MACOSX_RPATH TRUE)
+
+# ----------- Checking ---------
+INCLUDE(CheckIncludeFiles)
+INCLUDE(CheckFunctionExists)
+INCLUDE(CheckTypeSize)
+INCLUDE(CheckSymbolExists)
+CHECK_INCLUDE_FILES(float.h HAVE_FLOAT_H)
+CHECK_INCLUDE_FILES(inttypes.h HAVE_INTTYPES_H)
+CHECK_INCLUDE_FILES(limits.h HAVE_LIMITS_H)
+CHECK_INCLUDE_FILES(locale.h HAVE_LOCALE_H)
+CHECK_INCLUDE_FILES(stddef.h HAVE_STDDEF_H)
+CHECK_INCLUDE_FILES(stdint.h HAVE_STDINT_H)
+CHECK_INCLUDE_FILES(stdlib.h HAVE_STDLIB_H)
+CHECK_INCLUDE_FILES(string.h HAVE_STRING_H)
+CHECK_INCLUDE_FILES(unistd.h HAVE_UNISTD_H)
+CHECK_INCLUDE_FILES(wchar.h HAVE_WCHAR_H)
+CHECK_INCLUDE_FILES(wctype.h HAVE_WCTYPE_H)
+CHECK_FUNCTION_EXISTS(floor HAVE_FLOOR)
+CHECK_FUNCTION_EXISTS(isascii HAVE_ISASCII)
+CHECK_FUNCTION_EXISTS(localeconv HAVE_LOCALECONV)
+CHECK_FUNCTION_EXISTS(mblen HAVE_MBLEN)
+CHECK_FUNCTION_EXISTS(memmove HAVE_MEMMOVE)
+CHECK_FUNCTION_EXISTS(memset HAVE_MEMSET)
+CHECK_FUNCTION_EXISTS(modf HAVE_MODF)
+CHECK_FUNCTION_EXISTS(pow HAVE_POW)
+CHECK_FUNCTION_EXISTS(sqrt HAVE_SQRT)
+CHECK_FUNCTION_EXISTS(strcasecmp HAVE_STRCASECMP)
+CHECK_FUNCTION_EXISTS(strchr HAVE_STRCHR)
+CHECK_FUNCTION_EXISTS(strerror HAVE_STRERROR)
+CHECK_FUNCTION_EXISTS(strncasecmp HAVE_STRNCASECMP)
+CHECK_FUNCTION_EXISTS(strrchr HAVE_STRRCHR)
+CHECK_FUNCTION_EXISTS(strstr HAVE_STRSTR)
+CHECK_FUNCTION_EXISTS(strtol HAVE_STRTOL)
+CHECK_FUNCTION_EXISTS(strtoul HAVE_STRTOUL)
+CHECK_FUNCTION_EXISTS(strcoll HAVE_STRCOLL)
+CHECK_FUNCTION_EXISTS(strftime HAVE_STRFTIME)
+CHECK_FUNCTION_EXISTS(vprintf HAVE_VPRINTF)
+CHECK_TYPE_SIZE(ptrdiff_t SIZEOF_PTRDIFF_T)
+IF(HAVE_SIZEOF_PTRDIFF_T)
+	SET(HAVE_PTRDIFF_T 1)
+ELSE()
+	SET(HAVE_PTRDIFF_T 0)
+ENDIF()
+CHECK_TYPE_SIZE(size_t SIZEOF_SIZE_T)
+IF(HAVE_SIZEOF_SIZE_T)
+	SET(HAVE_SIZE_T 1)
+ELSE()
+	SET(HAVE_SIZE_T 0)
+	SET(size_t "unsigned")
+ENDIF()
+CHECK_SYMBOL_EXISTS("struct tm" "sys/time.h" TM_IN_SYS_TIME)
+CONFIGURE_FILE(include/ta_config.h.cmake include/ta_config.h)
+
+# -------------------------------
+
+SET(HEADER_LIST
+	include/ta_abstract.h
+	include/ta_common.h
+	include/ta_defs.h
+	include/ta_func.h
+	include/ta_libc.h
+	include/ta_config.h
+)
+
+INCLUDE_DIRECTORIES(
+	include
+	src/ta_abstract 
+	src/ta_abstract/frames
+	src/ta_common
+	src/ta_func
+)
+
+file(GLOB_RECURSE SRC_LIST
+	"src/ta_abstract/*.c" 
+	"src/ta_abstract/*.h"
+	"src/ta_common/*.c" 
+	"src/ta_common/*.h"
+	"src/ta_func/*.c" 
+	"src/ta_func/*.h"
+	) 
+
+ADD_LIBRARY(ta-lib STATIC ${HEADER_LIST} ${SRC_LIST})
+set_target_properties(ta-lib PROPERTIES LINKER_LANGUAGE C)
+
